@@ -1,0 +1,5 @@
+Header header
+uint8 channel_count
+uint16 frame_size
+uint16 sample_frequency
+portaudio_transport/AudioChannel[] channels
