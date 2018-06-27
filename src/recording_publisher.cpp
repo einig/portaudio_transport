@@ -52,31 +52,22 @@ int RecordingPublisher::RecordCallback(const void* pInputBuffer,
 // Clear out any data in the buffer and prepare for a new recording.
 void RecordingPublisher::Clear() {
     for (int c_channel = 0; c_channel < audio_channels_; c_channel++) {
-        sample_vector_[c_channel].clear();
+        sample_vector_.clear();
     }
 }
 
 // Dump the samples to a raw file
 void RecordingPublisher::WriteToFile(const std::string& filepath) {
-    float iSample;
-    std::stringstream filename;
-
     time_t t = time(0);
     struct tm * now = localtime( & t );
     char filebase [80];
     strftime (filebase,80,"%F_%H-%M-%S",now);
 
-    for (int c_channel = 0; c_channel < audio_channels_; c_channel++) {
-        //std::string filename = filepath + filebase + "-channel-" + std::to_string(c_channel) + ".wav";
-        std::string filename = "/tmp/test-channel-" + std::to_string(c_channel) + ".wav";
-        std::fstream fout(filename.c_str(), std::ios::out|std::ios::binary);
-        for (std::vector<float>::iterator iter = sample_vector_[c_channel].begin(); iter != sample_vector_[c_channel].end(); iter++)
-        {
-            iSample = (float) *iter;
-            fout.write((char *) &iSample, sizeof(float));
-        }
-        fout.close();
-    }
+    std::string filename = filepath + filebase + ".wav";
+    SndfileHandle file;
+    file = SndfileHandle(filename, SFM_WRITE, SF_FORMAT_WAV | SF_FORMAT_FLOAT, audio_channels_, sample_frequency_);
+
+    file.write(sample_vector_.data(), (sf_count_t) sample_vector_.size());
 }
 
 std::string RecordingPublisher::SampleFormatToString() {
