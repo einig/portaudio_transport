@@ -1,11 +1,10 @@
 #include <portaudio_transport/recording_publisher.h>
 
-RecordingPublisher::RecordingPublisher(ros::Publisher audio_publisher, int audio_channels, int sample_frequency, int frame_rate, portaudio::SampleDataFormat sample_format) {
+RecordingPublisher::RecordingPublisher(ros::Publisher audio_publisher, int audio_channels, int sample_frequency, int frame_rate) {
     audio_publisher_  = audio_publisher;
     audio_channels_   = audio_channels;
     sample_frequency_ = sample_frequency;
     frame_rate_     = frame_rate;
-    sample_format_    = sample_format;
     frame_size_     = sample_frequency_/frame_rate_;
     transport_.channels.clear();
     transport_.channel_count  = audio_channels_;

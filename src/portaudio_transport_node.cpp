@@ -99,7 +99,7 @@ int main(int argc, char **argv) {
         }
     }
     // Create the recording publisher
-    RecordingPublisher objRecordingPublisher(pub, inputChannels, recordingDevice.defaultSampleRate(), frame_rate, portaudio::FLOAT32);
+    RecordingPublisher objRecordingPublisher(pub, inputChannels, recordingDevice.defaultSampleRate(), frame_rate);
     portaudio::DirectionSpecificStreamParameters inParamsRecord(recordingDevice, inputChannels, portaudio::FLOAT32, false, recordingDevice.defaultLowInputLatency(), NULL);
     portaudio::StreamParameters paramsRecord(inParamsRecord, portaudio::DirectionSpecificStreamParameters::null(), recordingDevice.defaultSampleRate(), (recordingDevice.defaultSampleRate() / frame_rate), paClipOff);
     portaudio::MemFunCallbackStream<RecordingPublisher> streamRecord(paramsRecord, objRecordingPublisher, &RecordingPublisher::RecordCallback);
