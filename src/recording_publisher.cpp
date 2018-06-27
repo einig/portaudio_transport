@@ -11,9 +11,12 @@ RecordingPublisher::RecordingPublisher(ros::Publisher audio_publisher, int audio
     transport_.frame_size   = frame_size_;
     transport_.sample_frequency = sample_frequency_;
     transport_.channels.resize(audio_channels_);
-
+    for (int c_channel = 0; c_channel < audio_channels_; c_channel++) {
+        transport_.channels[c_channel].frame_data.resize(frame_size_);
+    }
     // Initialize sample vector with audio_channels_*frame_size_
-    sample_vector_.resize(audio_channels_);
+    // TODO: change initialization to sensible size once periodic writeback is working
+    //sample_vector_.resize(audio_channels_);
 }
 
 RecordingPublisher::~RecordingPublisher() {}
@@ -23,10 +26,6 @@ int RecordingPublisher::RecordCallback(const void* pInputBuffer,
                                 unsigned long iFramesPerBuffer,
                                 const PaStreamCallbackTimeInfo* timeInfo,
                                 PaStreamCallbackFlags statusFlags) {
-    for (int c_channel = 0; c_channel < audio_channels_; c_channel++) {
-        transport_.channels[c_channel].frame_data.clear(); // clear audio data in transport message
-    }
-
     float** pData = (float**) pInputBuffer;
 
     if (iFramesPerBuffer != frame_size_) {
@@ -38,10 +37,10 @@ int RecordingPublisher::RecordCallback(const void* pInputBuffer,
     }
 
     // Copy all the frames over to our internal vector of samples
-    for (int c_channel = 0; c_channel < audio_channels_; c_channel++) {
-        for (int c_sample = 0; c_sample < frame_size_; c_sample++) {
-            sample_vector_[c_channel].push_back(pData[c_channel][c_sample]);
-            transport_.channels[c_channel].frame_data.push_back(pData[c_channel][c_sample]);
+    for (int c_sample = 0; c_sample < frame_size_; c_sample++) {
+        for (int c_channel = 0; c_channel < audio_channels_; c_channel++) {
+            sample_vector_.push_back(pData[c_channel][c_sample]);
+            transport_.channels[c_channel].frame_data[c_sample] = pData[c_channel][c_sample];
         }
     }
 

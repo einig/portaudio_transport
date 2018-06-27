@@ -47,7 +47,7 @@ class RecordingPublisher {
         int                                 frame_rate_;
         int                                 sample_frequency_;
         portaudio::SampleDataFormat         sample_format_;
-        std::vector<std::vector<float>>     sample_vector_;
+        std::vector<float>                  sample_vector_;
         portaudio_transport::AudioTransport transport_;
 };
 
