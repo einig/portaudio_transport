@@ -109,7 +109,7 @@ int main(int argc, char **argv) {
 
     //ros::spin();
 
-    for (int i = 0; i < 1; ++i) { ros::Duration(5.0).sleep(); }
+    for (int i = 0; i < 5; ++i) { ros::Duration(1.0).sleep(); ROS_WARN("%d second passed", i+1); }
     streamRecord.stop();
 
     objRecordingPublisher.WriteToFile("/tmp/");
