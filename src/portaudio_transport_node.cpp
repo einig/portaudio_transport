@@ -11,7 +11,6 @@
 #include "portaudio_transport/AudioTransport.h"
 
 // ---------------------------------------------------------------------
-
 void PrintInputDevices(portaudio::System& audioSys) {
         std::stringstream available_devices;
         available_devices << "Available Recording Devices" << std::endl;
@@ -34,7 +33,6 @@ void PrintInputDevices(portaudio::System& audioSys) {
 int main(int argc, char **argv) {
     ros::init(argc, argv, "portaudio_transport_node");
     ros::NodeHandle nh("~");
-    ros::Rate loop_rate(10);
     ros::Publisher pub = nh.advertise<portaudio_transport::AudioTransport>("/portaudio_transport", 1);
     assert(CHAR_BIT * sizeof (float) == 32);
 
@@ -44,6 +42,8 @@ int main(int argc, char **argv) {
     int frame_rate = 0;
     int frame_size = 0;
     int max_channels = 0;
+    int file_write_rate = 10;
+    std::string file_path = "/tmp/portaudio_transport_";
     if (nh.getParam("input_device", input_device_name)) {
         ROS_INFO("Matching input device name for: %s" , input_device_name.c_str());
         boost::algorithm::to_lower(input_device_name);
@@ -64,21 +64,19 @@ int main(int argc, char **argv) {
     } else {
         ROS_WARN("Frame rate already specified, ignoring input for frame size");
     }
-
     if (nh.getParam("max_channels", max_channels)) {
         ROS_INFO("Limiting input channels to %d", max_channels);
     }
-
-    if (frame_rate != 0) {
-        frame_size = recordingDevice.defaultSampleRate() / frame_rate;
-    } else {
-        frame_rate = recordingDevice.defaultSampleRate() / frame_size;
+    if (nh.getParam("file_write_rate", file_write_rate)) {
+        ROS_INFO("Changing write rate to %dHz", file_write_rate);
     }
 
+    ros::Rate write_rate(file_write_rate);
 
     // Initialize audio system
     portaudio::System::initialize();
     ROS_INFO("Initialized %s", portaudio::System::versionText());
+    ROS_INFO("Changing file location is not yet supported. Recorded data will be saved in %s[date&time].wav", file_path.c_str());
 
     portaudio::System &audioSys = portaudio::System::instance();
     PrintInputDevices(audioSys);
@@ -105,30 +103,39 @@ int main(int argc, char **argv) {
         return 0;
     }
     portaudio::Device& recordingDevice = audioSys.deviceByIndex(input_device_id);
-    int inputChannels = recordingDevice.maxInputChannels();
+    double sample_rate = recordingDevice.defaultSampleRate();
+    int input_channels = recordingDevice.maxInputChannels();
     ROS_INFO_STREAM("Using device #" << recordingDevice.index() << " (" << recordingDevice.name() << ") with " << recordingDevice.maxInputChannels() << " input channels available and " << recordingDevice.hostApi().name() << " hostAPI");
 
+    if (frame_rate != 0) {
+        frame_size = recordingDevice.defaultSampleRate() / frame_rate;
+    } else if (frame_size != 0) {
+        frame_rate = recordingDevice.defaultSampleRate() / frame_size;
+    } else {
+        ROS_WARN("Neither _frame_size nor _frame_rate specified. Using default frame rate of 100");
+        frame_rate = 100;
+        frame_size = recordingDevice.defaultSampleRate() / frame_rate;
+    }
     if (max_channels != 0) {
-        inputChannels = std::min(recordingDevice.maxInputChannels(),max_channels);
+        input_channels = std::min(recordingDevice.maxInputChannels(), max_channels);
         if (recordingDevice.maxInputChannels() > max_channels) {
             ROS_WARN("Only transporting %d of %d input channels", max_channels, recordingDevice.maxInputChannels());
         }
     }
     // Create the recording publisher
-    RecordingPublisher objRecordingPublisher(pub, inputChannels, recordingDevice.defaultSampleRate(), frame_rate);
-    portaudio::DirectionSpecificStreamParameters inParamsRecord(recordingDevice, inputChannels, portaudio::FLOAT32, false, recordingDevice.defaultLowInputLatency(), NULL);
-    portaudio::StreamParameters paramsRecord(inParamsRecord, portaudio::DirectionSpecificStreamParameters::null(), recordingDevice.defaultSampleRate(), (recordingDevice.defaultSampleRate() / frame_rate), paClipOff);
+    RecordingPublisher objRecordingPublisher(pub, input_channels, recordingDevice.defaultSampleRate(), frame_rate, frame_size, file_path, file_write_rate);
+    portaudio::DirectionSpecificStreamParameters inParamsRecord(recordingDevice, input_channels, portaudio::FLOAT32, false, recordingDevice.defaultLowInputLatency(), NULL);
+    portaudio::StreamParameters paramsRecord(inParamsRecord, portaudio::DirectionSpecificStreamParameters::null(), recordingDevice.defaultSampleRate(), frame_size, paClipOff);
     portaudio::MemFunCallbackStream<RecordingPublisher> streamRecord(paramsRecord, objRecordingPublisher, &RecordingPublisher::RecordCallback);
+
+    ROS_INFO("Initialized transport publisher with [%d] channels, frame_size [%d], sample frequency [%.0lfHz] and a resulting frame rate [%dHz]", input_channels, frame_size, sample_rate, frame_rate);
 
     // Start reading the audio stream
     streamRecord.start();
 
-    //ros::spin();
-
-    for (int i = 0; i < 5; ++i) { ros::Duration(1.0).sleep(); ROS_WARN("%d second passed", i+1); }
-    streamRecord.stop();
-
-    objRecordingPublisher.WriteToFile("/tmp/");
-    ros::Duration(1.5).sleep();
+    while ((nh.ok()) && (ros::ok)) {
+        objRecordingPublisher.WriteToFile();
+        write_rate.sleep();
+    }
     return 0;
 }

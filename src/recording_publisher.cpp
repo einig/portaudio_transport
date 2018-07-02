@@ -1,11 +1,17 @@
 #include <portaudio_transport/recording_publisher.h>
 
-RecordingPublisher::RecordingPublisher(ros::Publisher audio_publisher, int audio_channels, int sample_frequency, int frame_rate) {
+RecordingPublisher::RecordingPublisher(ros::Publisher audio_publisher, int audio_channels, int sample_frequency, int frame_rate, int frame_size, std::string filepath, int file_write_rate) {
     audio_publisher_  = audio_publisher;
     audio_channels_   = audio_channels;
     sample_frequency_ = sample_frequency;
-    frame_rate_     = frame_rate;
-    frame_size_     = sample_frequency_/frame_rate_;
+    file_write_rate_  = file_write_rate;
+    if (frame_rate != 0) {
+        frame_rate_   = frame_rate;
+        frame_size_   = sample_frequency_/frame_rate_;
+    } else if (frame_size != 0) {
+        frame_size_   = frame_size;
+        frame_rate_   = sample_frequency_/frame_size_;
+    }
     transport_.channels.clear();
     transport_.channel_count  = audio_channels_;
     transport_.frame_size   = frame_size_;
@@ -14,9 +20,17 @@ RecordingPublisher::RecordingPublisher(ros::Publisher audio_publisher, int audio
     for (int c_channel = 0; c_channel < audio_channels_; c_channel++) {
         transport_.channels[c_channel].frame_data.resize(frame_size_);
     }
-    // Initialize sample vector with audio_channels_*frame_size_
-    // TODO: change initialization to sensible size once periodic writeback is working
-    //sample_vector_.resize(audio_channels_);
+
+    // Initialize the file name for writing to keep editing the same file
+    time_t t = time(0);
+    struct tm *now = localtime(&t);
+    char filebase [80];
+    strftime(filebase,80,"%F_%H-%M-%S",now);
+    filename_ = filepath + filebase + ".wav";
+
+    // Reserve sample vector with audio_channels_* frame in one write cycle
+    sample_vector_.reserve(audio_channels_*sample_frequency_/file_write_rate_);
+    sample_vector_write_.reserve(audio_channels_*sample_frequency_/file_write_rate_);
 }
 
 RecordingPublisher::~RecordingPublisher() {}
@@ -51,23 +65,15 @@ int RecordingPublisher::RecordCallback(const void* pInputBuffer,
 }
 // Clear out any data in the buffer and prepare for a new recording.
 void RecordingPublisher::Clear() {
-    for (int c_channel = 0; c_channel < audio_channels_; c_channel++) {
-        sample_vector_.clear();
-    }
+    sample_vector_.clear();
 }
 
 // Dump the samples to a raw file
-void RecordingPublisher::WriteToFile(const std::string& filepath) {
-    time_t t = time(0);
-    struct tm * now = localtime( & t );
-    char filebase [80];
-    strftime (filebase,80,"%F_%H-%M-%S",now);
-
-    std::string filename = filepath + filebase + ".wav";
+void RecordingPublisher::WriteToFile() {
+    sample_vector_write_ = std::move(sample_vector_);
     SndfileHandle file;
-    file = SndfileHandle(filename, SFM_WRITE, SF_FORMAT_WAV | SF_FORMAT_FLOAT, audio_channels_, sample_frequency_);
-
-    file.write(sample_vector_.data(), (sf_count_t) sample_vector_.size());
+    file = SndfileHandle(filename_, SFM_RDWR, SF_FORMAT_WAV | SF_FORMAT_FLOAT, audio_channels_, sample_frequency_);
+    file.write(sample_vector_write_.data(), (sf_count_t) sample_vector_write_.size());
 }
 
 std::string RecordingPublisher::SampleFormatToString() {

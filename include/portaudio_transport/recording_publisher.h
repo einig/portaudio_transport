@@ -28,7 +28,7 @@
 
 class RecordingPublisher {
     public:
-        RecordingPublisher(ros::Publisher audio_publisher, int audio_channels, int sample_frequency, int frame_rate, int frame_size);
+        RecordingPublisher(ros::Publisher audio_publisher, int audio_channels, int sample_frequency, int frame_rate, int frame_size, std::string filepath, int file_write_rate);
         ~RecordingPublisher();
 
         int RecordCallback(const void* pInputBuffer,
@@ -37,7 +37,7 @@ class RecordingPublisher {
                             const PaStreamCallbackTimeInfo* timeInfo,
                             PaStreamCallbackFlags statusFlags);
         void Clear();
-        void WriteToFile(const std::string& strFilename);
+        void WriteToFile();
         std::string SampleFormatToString();
 
     private:
@@ -48,7 +48,10 @@ class RecordingPublisher {
         int                                 sample_frequency_;
         portaudio::SampleDataFormat         sample_format_;
         std::vector<float>                  sample_vector_;
+        std::vector<float>                  sample_vector_write_;
         portaudio_transport::AudioTransport transport_;
+        std::string                         filename_ ;
+        int                                 file_write_rate_;
 };
 
 #endif
