@@ -28,7 +28,7 @@
 
 class RecordingPublisher {
     public:
-        RecordingPublisher(ros::Publisher audio_publisher, int audio_channels, int sample_frequency, int frame_rate);
+        RecordingPublisher(ros::Publisher audio_publisher, int audio_channels, int sample_frequency, int frame_rate, int frame_size);
         ~RecordingPublisher();
 
         int RecordCallback(const void* pInputBuffer,

@@ -41,7 +41,8 @@ int main(int argc, char **argv) {
     // Parse _input_device as string or int to check for the name or pick via id
     std::string input_device_name = "";
     int input_device_id = 0;
-    int frame_rate = 100;
+    int frame_rate = 0;
+    int frame_size = 0;
     int max_channels = 0;
     if (nh.getParam("input_device", input_device_name)) {
         ROS_INFO("Matching input device name for: %s" , input_device_name.c_str());
@@ -56,9 +57,24 @@ int main(int argc, char **argv) {
     if (nh.getParam("frame_rate", frame_rate)) {
         ROS_INFO("Using frame rate: %d", frame_rate);
     }
+    if (frame_rate == 0) {
+        if (nh.getParam("frame_size", frame_size)) {
+            ROS_INFO("Using frame size: %d", frame_size);
+        }
+    } else {
+        ROS_WARN("Frame rate already specified, ignoring input for frame size");
+    }
+
     if (nh.getParam("max_channels", max_channels)) {
         ROS_INFO("Limiting input channels to %d", max_channels);
     }
+
+    if (frame_rate != 0) {
+        frame_size = recordingDevice.defaultSampleRate() / frame_rate;
+    } else {
+        frame_rate = recordingDevice.defaultSampleRate() / frame_size;
+    }
+
 
     // Initialize audio system
     portaudio::System::initialize();
