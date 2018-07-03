@@ -7,8 +7,8 @@
 //
 // Copyright 2007 by Keith Vertanen.
 
-#ifndef _AUDIO_BUFFER_H_
-#define _AUDIO_BUFFER_H_
+#ifndef _RECORDING_PUBLISHER_H_
+#define _RECORDING_PUBLISHER_H_
 #include "ros/ros.h"
 
 #include <vector>

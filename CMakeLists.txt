@@ -35,7 +35,8 @@ find_package(portaudio)
 
 catkin_package(
  INCLUDE_DIRS include
- CATKIN_DEPENDS message_runtime
+ LIBRARIES ${PROJECT_NAME}
+ CATKIN_DEPENDS roscpp message_runtime
 )
 
 include_directories(
@@ -55,6 +56,4 @@ target_link_libraries(${PROJECT_NAME}_publisher
   sndfile
   portaudiocpp
   portaudio
-  #audio_buffer
 )
-

@@ -29,8 +29,8 @@ RecordingPublisher::RecordingPublisher(ros::Publisher audio_publisher, int audio
     filename_ = filepath + filebase + ".wav";
 
     // Reserve sample vector with audio_channels_* frame in one write cycle
-    sample_vector_.reserve(audio_channels_*sample_frequency_/file_write_rate_);
-    sample_vector_write_.reserve(audio_channels_*sample_frequency_/file_write_rate_);
+    sample_vector_.reserve(audio_channels_*sample_frequency_/file_write_rate_*2);
+    sample_vector_write_.reserve(audio_channels_*sample_frequency_/file_write_rate_*2);
 }
 
 RecordingPublisher::~RecordingPublisher() {}
