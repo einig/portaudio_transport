@@ -31,7 +31,7 @@ void PrintInputDevices(portaudio::System& audioSys) {
 }
 
 int main(int argc, char **argv) {
-    ros::init(argc, argv, "portaudio_transport_node");
+    ros::init(argc, argv, "portaudio_transport_publisher");
     ros::NodeHandle nh("~");
     ros::Publisher pub = nh.advertise<portaudio_transport::AudioTransport>("/portaudio_transport", 1);
     assert(CHAR_BIT * sizeof (float) == 32);

@@ -47,10 +47,9 @@ add_library(${PROJECT_NAME}_lib ${SOURCE_FILES} ${HEADERS})
 add_dependencies(${PROJECT_NAME}_lib ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}_lib ${catkin_LIBRARIES})
 
-add_executable(${PROJECT_NAME}_node src/portaudio_transport_node.cpp)
-add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})
-
-target_link_libraries(${PROJECT_NAME}_node
+add_executable(${PROJECT_NAME}_publisher src/portaudio_transport_publisher.cpp)
+add_dependencies(${PROJECT_NAME}_publisher ${catkin_EXPORTED_TARGETS})
+target_link_libraries(${PROJECT_NAME}_publisher
   ${catkin_LIBRARIES}
   ${PROJECT_NAME}_lib
   sndfile
