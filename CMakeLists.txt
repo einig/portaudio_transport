@@ -5,10 +5,12 @@ add_compile_options(-std=c++11)
 
 set(HEADERS
     include/${PROJECT_NAME}/recording_publisher.h
+    include/${PROJECT_NAME}/playback_subscriber.h
 )
 
 set(SOURCE_FILES
     src/recording_publisher.cpp
+    src/playback_subscriber.cpp
 )
 
 find_package(catkin REQUIRED COMPONENTS
@@ -51,6 +53,16 @@ target_link_libraries(${PROJECT_NAME}_lib ${catkin_LIBRARIES})
 add_executable(${PROJECT_NAME}_publisher src/portaudio_transport_publisher.cpp)
 add_dependencies(${PROJECT_NAME}_publisher ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}_publisher
+  ${catkin_LIBRARIES}
+  ${PROJECT_NAME}_lib
+  sndfile
+  portaudiocpp
+  portaudio
+)
+
+add_executable(${PROJECT_NAME}_subscriber src/portaudio_transport_subscriber.cpp)
+add_dependencies(${PROJECT_NAME}_subscriber ${catkin_EXPORTED_TARGETS})
+target_link_libraries(${PROJECT_NAME}_subscriber
   ${catkin_LIBRARIES}
   ${PROJECT_NAME}_lib
   sndfile
