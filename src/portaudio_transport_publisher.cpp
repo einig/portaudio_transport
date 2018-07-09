@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
 
     // Parse _input_device as string or int to check for the name or pick via id
     std::string input_device_name = "";
-    int input_device_id = 0;
+    int input_device_id = -1;
     int frame_rate = 0;
     int frame_size = 0;
     int max_channels = 0;
@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
     PrintInputDevices(audioSys);
 
     // Select input device by ID or name
-    if (input_device_id != 0) {
+    if (input_device_id != -1) {
         if (audioSys.deviceByIndex(input_device_id).maxInputChannels() < 1) {
             ROS_ERROR("Input device is not a recording device. Exiting...");
             return 0;
@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
             }
         }
     }
-    if (input_device_id == 0) {
+    if (input_device_id == -1) {
         ROS_ERROR("No matching input device found. Exiting...");
         return 0;
     }
