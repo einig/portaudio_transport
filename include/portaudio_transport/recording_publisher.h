@@ -1,12 +1,11 @@
-
-// Class that can be used to record, playback and save audio data
-// to a file.  It is designed to be a producer/consumer with the
-// portaudio library.
-//
-// This class expects mono audio in INT16 (short) format.
-//
-// Copyright 2007 by Keith Vertanen.
-
+//! portaudio_transport/recording_publisher allows publishing of live recordings via ROS topics.
+/*!
+    The recording publisher publishes live recorded data to the 'portaudio_transport' topic.
+    Published data format is float32. Recording parameters such as sample_frequency, audio_channels
+    and frame_size or frame_rate must be specified. The periodic file write function can be
+    configured as well. This class is the recording buffer which reads data from the sound card
+    input stream and publishes it to the ROS topic.
+*/
 #ifndef _RECORDING_PUBLISHER_H_
 #define _RECORDING_PUBLISHER_H_
 #include "ros/ros.h"
@@ -28,16 +27,26 @@
 
 class RecordingPublisher {
     public:
+        //! Constructor
+        /*! Requires info about stream, device and file properties */
         RecordingPublisher(ros::Publisher audio_publisher, int audio_channels, int sample_frequency, int frame_rate, int frame_size, std::string filepath, int file_write_rate);
         ~RecordingPublisher();
 
+        //! Function to read samples from the sound card callback and publish it to the ROS ropic
         int RecordCallback(const void* pInputBuffer,
                             void* pOutputBuffer,
                             unsigned long iFramesPerBuffer,
                             const PaStreamCallbackTimeInfo* timeInfo,
                             PaStreamCallbackFlags statusFlags);
+
+        //! Function to clear the internal sample buffer after writing to file or to reset the temporary recording
         void Clear();
+
+        //! Function to write the internal sample buffer to file
         void WriteToFile();
+
+        //! Function to express the sample format enum (float32) as a string.
+        // TODO: deprecate this function?
         std::string SampleFormatToString();
 
     private:
