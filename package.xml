@@ -4,14 +4,17 @@
   <version>0.0.0</version>
   <description>The portaudio_transport package allows the publishing of live
     sound recordings to ROS. Published audio data can be played on a playback
-    device. Arbitrary amounts of channels per device are supported.</description>
+    device. Arbitrary amounts of channels per device are supported.
+  </description>
   <maintainer email="einig@informatik.uni-hamburg.de">Lasse Einig</maintainer>
-  <license>BSD3</license>
+  <license>GPL-3.0</license>
   <url>https://github.com/TAMS-Group/portaudio_transport</url>
   <author>Lasse Einig</author>
 
   <buildtool_depend>catkin</buildtool_depend>
+
   <build_depend>roscpp</build_depend>
+  <build_depend>rospy</build_depend>
   <build_depend>sndfile</build_depend>
   <build_depend>portaudiocpp</build_depend>
   <build_depend>portaudio</build_depend>
@@ -19,10 +22,14 @@
   <build_depend>std_msgs</build_depend>
   <build_depend>message_generation</build_depend>
 
-  <exec_depend>message_runtime</exec_depend>
-
   <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>rospy</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+
+  <exec_depend>message_runtime</exec_depend>
   <exec_depend>roscpp</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
 
   <export>
   </export>
