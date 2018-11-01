@@ -46,15 +46,15 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_library(${PROJECT_NAME}_lib ${SOURCE_FILES} ${HEADERS})
-add_dependencies(${PROJECT_NAME}_lib ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
-target_link_libraries(${PROJECT_NAME}_lib ${catkin_LIBRARIES})
+add_library(${PROJECT_NAME} ${SOURCE_FILES} ${HEADERS})
+add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 add_executable(${PROJECT_NAME}_publisher src/portaudio_transport_publisher.cpp)
 add_dependencies(${PROJECT_NAME}_publisher ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}_publisher
   ${catkin_LIBRARIES}
-  ${PROJECT_NAME}_lib
+  ${PROJECT_NAME}
   sndfile
   portaudiocpp
   portaudio
@@ -64,7 +64,7 @@ add_executable(${PROJECT_NAME}_subscriber src/portaudio_transport_subscriber.cpp
 add_dependencies(${PROJECT_NAME}_subscriber ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}_subscriber
   ${catkin_LIBRARIES}
-  ${PROJECT_NAME}_lib
+  ${PROJECT_NAME}
   sndfile
   portaudiocpp
   portaudio
