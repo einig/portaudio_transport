@@ -31,10 +31,6 @@ generate_messages(
    std_msgs
 )
 
-find_package(sndfile)
-find_package(portaudiocpp)
-find_package(portaudio)
-
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES ${PROJECT_NAME}
