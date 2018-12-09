@@ -15,7 +15,7 @@
 	<arg name="max_channels" default=""/>
 
 	<!-- The node writes out the data to a .wav file in /tmp/portaudio_transport_*. The default value for writing is 10Hz. Higher values increase hard disk load, lower values increase memory consumption. -->
-	<arg name="file_write_rate" value=""/>
+	<arg name="file_write_rate" default=""/>
 
 	<node name="portaudio_transport_publisher" pkg="portaudio_transport" type="portaudio_transport_publisher" output="screen">
 		<param name="input_device" value="$(arg input_device)"/>
