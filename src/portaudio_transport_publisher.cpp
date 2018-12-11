@@ -157,7 +157,7 @@ int main(int argc, char **argv) {
 
     // Keep the system running and write to file periodically
     while ((nh.ok()) && (ros::ok)) {
-        objRecordingPublisher.WriteToFile();
+//        objRecordingPublisher.WriteToFile();
         write_rate.sleep();
     }
     return 0;
