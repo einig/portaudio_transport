@@ -2,26 +2,28 @@
 <!-- Example launch file. You must create your own launch file and configure it for your sound card. -->
 
 <launch>
-	<!-- Enter the number of your device (check node output at startup) or a sub-string which uniquely identifies your device. -->
-	<arg name="input_device" default=""/>
+    <!-- Enter the number of your device (check node output at startup) or a sub-string which uniquely identifies your device. -->
+    <arg name="input_device" default=""/>
 
-	<!-- Specify either frame_rate or frame_size, if both are specified, the frame_rate will be used. Default value is 100Hz. -->
-	<arg name="frame_rate" default=""/>
+    <!-- Specify either frame_rate or frame_size, if both are specified, the frame_rate will be used. Default value is 100Hz. -->
+    <arg name="frame_rate" default=""/>
 
-	<!-- Specify either frame_rate or frame_size, if both are specified, frame_size will be ignored. If none is specified, the default frame_rate of 100Hz will be used. -->
-	<arg name="frame_size" default=""/>
+    <!-- Specify either frame_rate or frame_size, if both are specified, frame_size will be ignored. If none is specified, the default frame_rate of 100Hz will be used. -->
+    <arg name="frame_size" default=""/>
 
-	<!-- Specify the input channel count. If no value is given, the maximum input channels of the device will be used. -->
-	<arg name="max_channels" default=""/>
+    <!-- Specify the input channel count. If no value is given, the maximum input channels of the device will be used. -->
+    <arg name="max_channels" default=""/>
 
-	<!-- The node writes out the data to a .wav file in /tmp/portaudio_transport_*. The default value for writing is 10Hz. Higher values increase hard disk load, lower values increase memory consumption. -->
-	<arg name="file_write_rate" default=""/>
+    <!-- The node writes out the data to a .wav file in /tmp/portaudio_transport_*. The default value for writing is 10Hz. Higher values increase hard disk load, lower values increase memory consumption. -->
+    <arg name="file_write_rate" default=""/>
+    <arg name="save_file" default="false"/>
 
-	<node name="portaudio_transport_publisher" pkg="portaudio_transport" type="portaudio_transport_publisher" output="screen">
-		<param name="input_device" value="$(arg input_device)"/>
-		<param name="frame_rate" value="$(arg frame_rate)"/>
-		<param name="frame_size" value="$(arg frame_size)"/>
-		<param name="max_channels" value="$(arg max_channels)"/>
+    <node name="portaudio_transport_publisher" pkg="portaudio_transport" type="portaudio_transport_publisher" output="screen" >
+        <param name="input_device" value="$(arg input_device)"/>
+        <param name="frame_rate" value="$(arg frame_rate)"/>
+        <param name="frame_size" value="$(arg frame_size)"/>
+        <param name="max_channels" value="$(arg max_channels)"/>
         <param name="file_write_rate" value="$(arg file_write_rate)"/>
+        <param name="save_file" value="$(arg save_file)"/>
     </node>
 </launch>
