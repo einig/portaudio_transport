@@ -49,6 +49,8 @@ int main(int argc, char **argv) {
     int frame_size = 0;
     int max_channels = 0;
     int file_write_rate = 10;
+    bool save_file = false;
+    nh.getParam("save_file", save_file);
     // TODO: should the file path be configurable?
     std::string file_path = "/tmp/portaudio_transport_";
 
@@ -157,8 +159,6 @@ int main(int argc, char **argv) {
 
     // Keep the system running and write to file periodically
     while ((nh.ok()) && (ros::ok)) {
-        bool save_file = false;
-        nh.getParam("save_file", save_file);
         if (save_file)
         {objRecordingPublisher.WriteToFile();}
         write_rate.sleep();
